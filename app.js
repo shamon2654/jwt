@@ -21,7 +21,7 @@ app.use(userRoutes)
 app.use(notfound)
 app.use(errorHandlerMiddleware)
 
-const port =  6000;
+const port = process.env.PORT || 6000;
 const start = async () => {
     try {
         await connectDB(process.env.MONGO_URL)
