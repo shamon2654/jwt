@@ -53,12 +53,27 @@ const userVerification = (req, res, next) => {
             return res.status(400).json({ msg: "Invalid Cridential" });
         }
         console.log(user);
-        req.id = user.id;
+        req.id = user.id;// store id in request 
     });
     next();
+}
+
+const getUser = async (req, res, next) => {
+    const userID = req.id;//get the requset id
+    let user;
+    try {
+         user = await User.findById(userID, "-password");
+    } catch (error) {
+        return new Error(error);
+    }
+    if (!user) {
+        return res.status(404).json({msg:"User Not Found"})
+    }
+    return res.status(200).json({user})
 }
 module.exports = {
     signUp,
     login,
     userVerification,
+    getUser
 }
