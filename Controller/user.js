@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const bcrypt=require('bcryptjs')//it is used to encryption some values like password.using algorithms MD5,SHA256 and it converted into cypher text
-const jsonWebToken=require("jsonwebtoken")
+const jsonWebToken = require("jsonwebtoken")
 
 
 const signUp = async (req, res, next) => {
@@ -36,26 +36,35 @@ const login = async (req, res, next) => {
     }
     const userToken = jsonWebToken.sign({ id: existingUser._id },//sign using to create token
         process.env.WEB_TOKEN_SECRET,//using to generate ecripted token
-        { expiresIn: "2hr" });//seting time
+        { expiresIn: "40s" });//seting time
+    //cookie
+  res.cookie(String(existingUser._id), userToken, {//cookie using to create new cookie 
+    path: "/",//set path and / using it acess enter of all the project
+    expires: new Date(Date.now() + 1000 * 30),//how many time expire the cookie
+    httpOnly: true,//only access http
+    sameSite:"lax"//it is using to only access cookies in link or api
+  });
     
    return res.status(200).json(({msg:"success",userToken}))
 }; 
 
 const userVerification = (req, res, next) => {
-    const header = req.headers["authorization"];
-    const token = header.split(" ")[1];
+    const cookie = req.headers.cookie;
+    const token = cookie.split("=")[1];
     console.log(token)
     if (!token) {
-        return res.status(404).json({msg:"Invalid Cridential"})
+        return res.status(404).json({msg:"Invalid Cridential:token notfount"})
     };
     jsonWebToken.verify(token.toString(), process.env.WEB_TOKEN_SECRET, (error, user) => {
         if (error) {
             return res.status(400).json({ msg: "Invalid Cridential" });
         }
-        console.log(user);
+        
         req.id = user.id;// store id in request 
     });
     next();
+  
+  console.log(cookie)
 }
 
 const getUser = async (req, res, next) => {
