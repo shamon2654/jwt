@@ -1,15 +1,19 @@
 const express = require("express");
+const connectDB = require("./DB/connect");
+const notfound = require("./Middlware/notFound");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const userRoutes = require("./Routes/user");
 require('express-async-errors');
 require("dotenv").config();
-const connectDB = require("./DB/connect");
-const cookieParser=require("cookie-parser")
-const userRoutes=require("./Routes/user")
-const notfound = require("./Middlware/notFound");
 const errorHandlerMiddleware = require("./Middlware/errorHandler");
 
 
 
 const app = express();//insigness of express
+app.use(cors({//define frondend path for recognize
+    origin:'http://localhost:5173',
+}));
 
 app.use(express.json())//conver express contents into json
 app.use(cookieParser())//using to acess cookies
