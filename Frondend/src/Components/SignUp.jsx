@@ -1,8 +1,10 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
 import React, { useState } from "react";
+import {  useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -31,7 +33,7 @@ const SignUp = () => {
  
   const handleSubmit = (e) => {
     e.preventDefault();
-    senderFunction();
+    senderFunction().then(()=>{navigate("/login")})
   }
   return (
     <div style={{ margin: "75px" }}>

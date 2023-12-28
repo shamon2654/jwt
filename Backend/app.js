@@ -12,7 +12,8 @@ const errorHandlerMiddleware = require("./Middlware/errorHandler");
 
 const app = express();//insigness of express
 app.use(cors({//define frondend path for recognize
-    origin:'http://localhost:5173',
+    origin: 'http://localhost:5173',
+    credentials:true,
 }));
 
 app.use(express.json())//conver express contents into json

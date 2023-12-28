@@ -1,8 +1,10 @@
 import { Box, Button, TextField, Typography } from "@mui/material"
 import React, { useState } from "react";
+import {useNavigate} from "react-router-dom"
 import axios from "axios";
 
 const Login = () => {
+  const navigate = useNavigate();//instance of navigate
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,7 +31,7 @@ const Login = () => {
  
   const handleSubmit = (e) => {
     e.preventDefault();
-    senderFunction();
+    senderFunction().then(() => { navigate("/home") })//navigate use when we login after that will go home or any page just give the path that page
   }
   return (
     <div style={{ margin: "75px" }}>
