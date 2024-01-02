@@ -64,7 +64,7 @@ const Login = () => {
             name="password"
           />
           <Button variant="contained" type="submit">
-            SignUp
+            Login
           </Button>
         </Box>
       </form>

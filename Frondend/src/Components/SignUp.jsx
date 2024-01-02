@@ -32,7 +32,7 @@ const SignUp = () => {
   }
  
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     senderFunction().then(()=>{navigate("/login")})
   }
   return (

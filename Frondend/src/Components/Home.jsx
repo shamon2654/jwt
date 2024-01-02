@@ -12,15 +12,14 @@ const Home = () => {
         console.log(res)
         const data = await res.data;
         console.log(data)
-        return data;
-        
+        return data;  
     }
     useEffect(() => {
         passRequest().then((data) => setUser(data));
     },[])
   return (
     <div style={{ margin: "75px" }}>
-      home
+    helo
     </div>
   )
 }

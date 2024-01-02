@@ -71,18 +71,50 @@ const getUser = async (req, res, next) => {
     const userID = req.id;//get the requset id
     let user;
     try {
-         user = await User.findById(userID, "-password");
+        user = await User.findById(userID, "-password");
     } catch (error) {
         return new Error(error);
     }
     if (!user) {
-        return res.status(404).json({msg:"User Not Found"})
+        return res.status(404).json({ msg: "User Not Found" })
     }
-    return res.status(200).json({user})
+    return res.status(200).json({ user })
+};
+
+const refreshToken = (req, res, next) => {
+    const cookie = req.headers.cookie;
+    console.log(cookie)
+    const oldToken = cookie.split("=")[1];
+    if (!oldToken) {
+        return res.status(400).json({ msg: "Something Went Wrong" });
+    }
+    jsonWebToken.verify(oldToken.toString(), process.env.WEB_TOKEN_SECRET, (error, user) => {
+        if (error) {
+            console.log(error)
+            res.status(400).json({ msg: "Authentication Filed" });
+        }
+        console.log(user)
+        res.clearCookie(`${user.id}`);//clear the old token 
+        req.cookie[`${user.id}`] = "";//set the cookie to null
+        const newToken = jsonWebToken.sign({ id: user.id },//create new token
+            process.env.WEB_TOKEN_SECRET, {
+            expiresIn: "40s"
+        }
+        );
+        res.cookie(String(user.id), newToken, {//set the new token in the cookie
+            path: "/",//set path and / using it acess enter of all the project
+            expires: new Date(Date.now() + 1000 * 30),//how many time expire the cookie
+            httpOnly: true,//only access http
+            sameSite: "lax"//it is using to only access cookies in link or api
+        });
+        req.id = user.id;
+    })
+    next()
 }
 module.exports = {
     signUp,
     login,
     userVerification,
-    getUser
+    getUser,
+    refreshToken
 }
