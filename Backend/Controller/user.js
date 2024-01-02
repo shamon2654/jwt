@@ -38,9 +38,13 @@ const login = async (req, res, next) => {
         process.env.WEB_TOKEN_SECRET,//using to generate ecripted token
         { expiresIn: "40s" });//seting time
     //cookie
+    if (req.cookies[`${existingUser._id}`]) {
+        req.cookies[`${existingUser.id}`] = "";
+    }
+    console.log("first token",userToken)
   res.cookie(String(existingUser._id), userToken, {//cookie using to create new cookie 
     path: "/",//set path and / using it acess enter of all the project
-    expires: new Date(Date.now() + 1000 * 30),//how many time expire the cookie
+    expires: new Date(Date.now() + 1000 * 40),//how many time expire the cookie
     httpOnly: true,//only access http
     sameSite:"lax"//it is using to only access cookies in link or api
   });
@@ -51,7 +55,6 @@ const login = async (req, res, next) => {
 const userVerification = (req, res, next) => {
     const cookie = req.headers.cookie;
     const token = cookie.split("=")[1];
-    console.log(token)
     if (!token) {
         return res.status(404).json({msg:"Invalid Cridential:token notfount"})
     };
@@ -63,8 +66,6 @@ const userVerification = (req, res, next) => {
         req.id = user.id;// store id in request 
     });
     next();
-  
-  console.log(cookie)
 }
 
 const getUser = async (req, res, next) => {
@@ -83,8 +84,8 @@ const getUser = async (req, res, next) => {
 
 const refreshToken = (req, res, next) => {
     const cookie = req.headers.cookie;
-    console.log(cookie)
     const oldToken = cookie.split("=")[1];
+    
     if (!oldToken) {
         return res.status(400).json({ msg: "Something Went Wrong" });
     }
@@ -95,19 +96,21 @@ const refreshToken = (req, res, next) => {
         }
         console.log(user)
         res.clearCookie(`${user.id}`);//clear the old token 
-        req.cookie[`${user.id}`] = "";//set the cookie to null
+        req.cookies[`${user.id}`] = "";//set the cookie to null
         const newToken = jsonWebToken.sign({ id: user.id },//create new token
             process.env.WEB_TOKEN_SECRET, {
             expiresIn: "40s"
         }
         );
+        console.log("second token",newToken)
         res.cookie(String(user.id), newToken, {//set the new token in the cookie
             path: "/",//set path and / using it acess enter of all the project
-            expires: new Date(Date.now() + 1000 * 30),//how many time expire the cookie
+            expires: new Date(Date.now() + 1000 * 40),//how many time expire the cookie
             httpOnly: true,//only access http
             sameSite: "lax"//it is using to only access cookies in link or api
         });
         req.id = user.id;
+        
     })
     next()
 }
